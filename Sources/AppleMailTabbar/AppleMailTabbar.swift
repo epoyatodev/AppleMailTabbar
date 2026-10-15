@@ -9,6 +9,7 @@ public protocol MailTabItem: CaseIterable, Hashable {
     var activeBackground: Color { get }
 }
 
+/// Full screen container: `NavigationStack` + `ScrollView` with the tab bar on top of the content.
 public struct AppleMailTabbar<Tab: MailTabItem, Content: View>: View {
     private let listTitle: String
     private let spacing: CGFloat
@@ -16,10 +17,6 @@ public struct AppleMailTabbar<Tab: MailTabItem, Content: View>: View {
     private let isGestureEnabled: Bool
     @Binding private var selection: Tab
     private let content: (Tab) -> Content
-    /// View Properties
-    ///  Used to calculate the inactive tab with to sync animations perfectly!
-    @State private var tabTitleSizes: [Tab: CGSize] = [:]
-    @State private var previousTab: Tab?
 
     public init(
         listTitle: String,
@@ -40,42 +37,76 @@ public struct AppleMailTabbar<Tab: MailTabItem, Content: View>: View {
     public var body: some View {
         NavigationStack {
             ScrollView(.vertical) {
-                let isLastTabActive: Bool = selection == allTabs.last
-                GeometryReader {
-                    let containerSize = $0.size
-                    let activeTitleWidth: CGFloat = tabTitleSizes[selection]?.width ?? 0
-                    /// Symbol: 20, Horizontal Padding: 40, Spacing: 6
-                    let activeWidth: CGFloat = activeTitleWidth + 60 + 6
-                    let removeCount: Int = isLastTabActive ? 1 : min(2, allTabs.count - 1)
-                    /// Avoid division by zero when there is a single tab
-                    let inactiveCount: Int = max(allTabs.count - removeCount, 1)
-                    let spacingValue: CGFloat = CGFloat(inactiveCount) * spacing
-                    let inActiveWidth: CGFloat = max((containerSize.width - activeWidth - spacingValue) / CGFloat(inactiveCount), 0)
-
-                    HStack(spacing: spacing) {
-                        ForEach(allTabs, id: \.self) { tab in
-                            TabItemView(tab, inActiveWidth: inActiveWidth)
-                        }
-                    }
-                }
-                .padding(.trailing, isLastTabActive ? 0 : trailingVisibility)
-                .frame(height: 38)
-                .contentShape(.rect)
-                .gesture(toggleGesture, isEnabled: isGestureEnabled)
-                .animation(animation, value: selection)
-                .onAppear {
-                    guard previousTab == nil else { return }
-                    previousTab = selection
-                }
-                .onChange(of: selection) { oldValue, newValue in
-                    previousTab = oldValue
-                }
+                MailTabBar(
+                    selection: $selection,
+                    spacing: spacing,
+                    trailingVisibility: trailingVisibility,
+                    isGestureEnabled: isGestureEnabled
+                )
 
                 /// Content
                 content(selection)
             }
             .safeAreaPadding(15)
             .navigationTitle(listTitle)
+        }
+    }
+}
+
+/// Standalone tab bar, without any container. Place it wherever you need it
+/// (a `List` row, a `safeAreaInset`, a toolbar, your own `ScrollView`...).
+public struct MailTabBar<Tab: MailTabItem>: View {
+    private let spacing: CGFloat
+    private let trailingVisibility: CGFloat
+    private let isGestureEnabled: Bool
+    @Binding private var selection: Tab
+    /// View Properties
+    ///  Used to calculate the inactive tab with to sync animations perfectly!
+    @State private var tabTitleSizes: [Tab: CGSize] = [:]
+    @State private var previousTab: Tab?
+
+    public init(
+        selection: Binding<Tab>,
+        spacing: CGFloat = 8,
+        trailingVisibility: CGFloat = 15,
+        isGestureEnabled: Bool = true
+    ) {
+        self._selection = selection
+        self.spacing = spacing
+        self.trailingVisibility = trailingVisibility
+        self.isGestureEnabled = isGestureEnabled
+    }
+
+    public var body: some View {
+        let isLastTabActive: Bool = selection == allTabs.last
+        GeometryReader {
+            let containerSize = $0.size
+            let activeTitleWidth: CGFloat = tabTitleSizes[selection]?.width ?? 0
+            /// Symbol: 20, Horizontal Padding: 40, Spacing: 6
+            let activeWidth: CGFloat = activeTitleWidth + 60 + 6
+            let removeCount: Int = isLastTabActive ? 1 : min(2, allTabs.count - 1)
+            /// Avoid division by zero when there is a single tab
+            let inactiveCount: Int = max(allTabs.count - removeCount, 1)
+            let spacingValue: CGFloat = CGFloat(inactiveCount) * spacing
+            let inActiveWidth: CGFloat = max((containerSize.width - activeWidth - spacingValue) / CGFloat(inactiveCount), 0)
+
+            HStack(spacing: spacing) {
+                ForEach(allTabs, id: \.self) { tab in
+                    TabItemView(tab, inActiveWidth: inActiveWidth)
+                }
+            }
+        }
+        .padding(.trailing, isLastTabActive ? 0 : trailingVisibility)
+        .frame(height: 38)
+        .contentShape(.rect)
+        .gesture(toggleGesture, isEnabled: isGestureEnabled)
+        .animation(animation, value: selection)
+        .onAppear {
+            guard previousTab == nil else { return }
+            previousTab = selection
+        }
+        .onChange(of: selection) { oldValue, newValue in
+            previousTab = oldValue
         }
     }
 
@@ -221,6 +252,23 @@ enum MailTab: MailTabItem {
             }
         }
         .padding(.top, 15)
+    }
+}
+
+#Preview("List") {
+    @Previewable @State var activeTab: MailTab = .primary
+    NavigationStack {
+        List {
+            MailTabBar(selection: $activeTab)
+                .listRowInsets(EdgeInsets(top: 0, leading: 15, bottom: 0, trailing: 15))
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+
+            ForEach(1...20, id: \.self) { index in
+                Text("\(activeTab.title) mail #\(index)")
+            }
+        }
+        .navigationTitle("Inbox")
     }
 }
 #endif

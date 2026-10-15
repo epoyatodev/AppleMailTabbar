@@ -110,6 +110,34 @@ AppleMailTabbar(
 }
 ```
 
+### Tab bar only
+
+If you need a different container (e.g. a `List`), use `MailTabBar`. It is just the bar, with no `NavigationStack`, `ScrollView` or title, so you place it wherever you want.
+
+```swift
+struct InboxView: View {
+    @State private var selectedTab: InboxTab = .primary
+
+    var body: some View {
+        NavigationStack {
+            List {
+                MailTabBar(selection: $selectedTab)
+                    .listRowInsets(EdgeInsets(top: 0, leading: 15, bottom: 0, trailing: 15))
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+
+                ForEach(mails(for: selectedTab)) { mail in
+                    MailRow(mail: mail)
+                }
+            }
+            .navigationTitle("Inbox")
+        }
+    }
+}
+```
+
+`MailTabBar` accepts the same `spacing`, `trailingVisibility` and `isGestureEnabled` options.
+
 ## Behavior
 
 - **Tap** an inactive tab to select it.
