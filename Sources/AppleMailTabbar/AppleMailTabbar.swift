@@ -268,6 +268,7 @@ enum MailTab: MailTabItem {
                 Text("\(activeTab.title) mail #\(index)")
             }
         }
+        .listStyle(.plain)
         .navigationTitle("Inbox")
     }
 }

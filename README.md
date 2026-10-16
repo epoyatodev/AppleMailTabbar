@@ -2,6 +2,21 @@
 
 A SwiftUI tab bar inspired by the category tabs in Apple's Mail app. The active tab expands into a capsule with its icon and title, the others collapse into compact pills, and the last tab acts as an "All mail" toggle.
 
+<p align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="Assets/scroll-primary-dark.png">
+  <img src="Assets/scroll-primary-light.png" alt="Primary tab active" width="240">
+</picture>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="Assets/scroll-promotions-dark.png">
+  <img src="Assets/scroll-promotions-light.png" alt="Promotions tab active" width="240">
+</picture>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="Assets/scroll-all-dark.png">
+  <img src="Assets/scroll-all-light.png" alt="All mail tab active" width="240">
+</picture>
+</p>
+
 ## Requirements
 
 - iOS 18+
@@ -130,11 +145,21 @@ struct InboxView: View {
                     MailRow(mail: mail)
                 }
             }
+            .listStyle(.plain)
             .navigationTitle("Inbox")
         }
     }
 }
 ```
+
+<p align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="Assets/list-updates-dark.png">
+  <img src="Assets/list-updates-light.png" alt="MailTabBar inside a List" width="240">
+</picture>
+</p>
+
+Use `.listStyle(.plain)` so the bar spans the full row width. With the default inset grouped style the bar sits inside the section card and the peeking last tab gets clipped.
 
 `MailTabBar` accepts the same `spacing`, `trailingVisibility` and `isGestureEnabled` options.
 
