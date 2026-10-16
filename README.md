@@ -17,6 +17,13 @@ A SwiftUI tab bar inspired by the category tabs in Apple's Mail app. The active 
 </picture>
 </p>
 
+<p align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="Assets/scroll-dark.gif">
+  <img src="Assets/scroll-light.gif" alt="AppleMailTabbar animation" width="400">
+</picture>
+</p>
+
 ## Requirements
 
 - iOS 18+
@@ -156,6 +163,10 @@ struct InboxView: View {
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="Assets/list-updates-dark.png">
   <img src="Assets/list-updates-light.png" alt="MailTabBar inside a List" width="240">
+</picture>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="Assets/list-dark.gif">
+  <img src="Assets/list-light.gif" alt="MailTabBar animation inside a List" width="400">
 </picture>
 </p>
 
