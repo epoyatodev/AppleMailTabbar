@@ -164,10 +164,6 @@ struct InboxView: View {
   <source media="(prefers-color-scheme: dark)" srcset="Assets/list-updates-dark.png">
   <img src="Assets/list-updates-light.png" alt="MailTabBar inside a List" width="240">
 </picture>
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="Assets/list-dark.gif">
-  <img src="Assets/list-light.gif" alt="MailTabBar animation inside a List" width="400">
-</picture>
 </p>
 
 Use `.listStyle(.plain)` so the bar spans the full row width. With the default inset grouped style the bar sits inside the section card and the peeking last tab gets clipped.
